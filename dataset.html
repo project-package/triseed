@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataset & Info - CornVision AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <span>CornVision AI</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+                <a href="analyze.html" class="nav-item"><i class="fas fa-camera"></i><span>Analyze Seed</span></a>
+                <a href="history.html" class="nav-item"><i class="fas fa-history"></i><span>History</span></a>
+                <!--<a href="compare.html" class="nav-item"><i class="fas fa-balance-scale"></i><span>Compare</span></a>-->
+                <a href="dataset.html" class="nav-item active"><i class="fas fa-database"></i><span>Dataset</span></a>
+                <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="login.html" style="text-decoration: none;">
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Dataset & Information</h1>
+                    <p>Learn about our training data and corn varieties</p>
+                </div>
+            </div>
+
+            <!-- Dataset Stats -->
+            <div class="dataset-stats">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-database"></i></div>
+                    <div class="stat-number">12,847</div>
+                    <div class="stat-label">Training Images</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-number">94.7%</div>
+                    <div class="stat-label">Validation Accuracy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Corn Varieties</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-microscope"></i></div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Quality Levels</div>
+                </div>
+            </div>
+
+            <!-- Variety Gallery -->
+            <div class="variety-gallery">
+                <h2>Corn Varieties</h2>
+                <div class="variety-grid">
+                    <div class="variety-card sweet">
+                        <div class="variety-image">
+                            <i class="fas fa-corn"></i>
+                        </div>
+                        <h3>Sweet Corn</h3>
+                        <p>High sugar content, tender kernels. Ideal for fresh consumption and canning.</p>
+                        <div class="variety-details">
+                            <span><i class="fas fa-chart-line"></i> Performance: 85-95%</span>
+                            <span><i class="fas fa-tag"></i> Market: Premium</span>
+                        </div>
+                        <div class="quality-examples">
+                            <strong>Quality Indicators:</strong>
+                            <ul>
+                                <li>Bright yellow/gold color</li>
+                                <li>Plump, uniform kernels</li>
+                                <li>No visible damage</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="variety-card flour">
+                        <div class="variety-image">
+                            <i class="fas fa-wheat-alt"></i>
+                        </div>
+                        <h3>Flour Corn</h3>
+                        <p>Soft, starchy endosperm. Excellent for milling and baking applications.</p>
+                        <div class="variety-details">
+                            <span><i class="fas fa-chart-line"></i> Performance: 75-90%</span>
+                            <span><i class="fas fa-tag"></i> Market: Standard</span>
+                        </div>
+                        <div class="quality-examples">
+                            <strong>Quality Indicators:</strong>
+                            <ul>
+                                <li>Chalky white appearance</li>
+                                <li>Soft texture</li>
+                                <li>Complete kernel integrity</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="variety-card waxy">
+                        <div class="variety-image">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <h3>Waxy Corn</h3>
+                        <p>Chewy texture, waxy starch. Prized for Asian cuisine and industrial starch.</p>
+                        <div class="variety-details">
+                            <span><i class="fas fa-chart-line"></i> Performance: 80-92%</span>
+                            <span><i class="fas fa-tag"></i> Market: Specialty</span>
+                        </div>
+                        <div class="quality-examples">
+                            <strong>Quality Indicators:</strong>
+                            <ul>
+                                <li>Pearlescent appearance</li>
+                                <li>Uniform kernel size</li>
+                                <li>No cracks or fissures</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quality Levels -->
+            <div class="quality-levels">
+                <h2>Quality Classification</h2>
+                <div class="quality-grid">
+                    <div class="quality-card high">
+                        <div class="quality-badge"><i class="fas fa-crown"></i> High Quality</div>
+                        <p>Superior seeds with excellent characteristics for planting or consumption.</p>
+                        <div class="criteria">
+                            <strong>Criteria:</strong>
+                            <ul>
+                                <li>≥ 90% uniformity</li>
+                                <li>Vibrant, consistent color</li>
+                                <li>No visible defects</li>
+                                <li>Optimal size range</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="quality-card moderate">
+                        <div class="quality-badge"><i class="fas fa-chart-line"></i> Moderate Quality</div>
+                        <p>Suitable for most applications with minor imperfections.</p>
+                        <div class="criteria">
+                            <strong>Criteria:</strong>
+                            <ul>
+                                <li>70-89% uniformity</li>
+                                <li>Slight color variation</li>
+                                <li>Minor surface blemishes</li>
+                                <li>Slight size variation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="quality-card low">
+                        <div class="quality-badge"><i class="fas fa-exclamation-triangle"></i> Low Quality</div>
+                        <p>Limited applications; may have significant defects.</p>
+                        <div class="criteria">
+                            <strong>Criteria:</strong>
+                            <ul>
+                                <li>< 70% uniformity</li>
+                                <li>Discoloration present</li>
+                                <li>Cracks or damage visible</li>
+                                <li>Irregular size/shape</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Architecture -->
+            <div class="model-architecture">
+                <h2><i class="fas fa-microchip"></i> CNN Model Architecture</h2>
+                <div class="architecture-diagram">
+                    <div class="layer">Input Layer (224x224x3)</div>
+                    <div class="arrow">↓</div>
+                    <div class="layer">Conv2D + ReLU (32 filters)</div>
+                    <div class="arrow">↓</div>
+                    <div class="layer">MaxPooling (2x2)</div>
+                    <div class="arrow">↓</div>
+                    <div class="layer">Conv2D + ReLU (64 filters)</div>
+                    <div class="arrow">↓</div>
+                    <div class="layer">MaxPooling (2x2)</div>
+                    <div class="arrow">↓</div>
+                    <div class="layer">Conv2D + ReLU (128 filters)</div>
+                    <div class="arrow">↓</div>
+                    <div class="layer">Global Average Pooling</div>
+                    <div class="arrow">↓</div>
+                    <div class="layer">Dense (256) + Dropout</div>
+                    <div class="arrow">↓</div>
+                    <div class="layer">Output (3 varieties + 3 qualities)</div>
+                </div>
+                <div class="model-stats">
+                    <p><strong>Total Parameters:</strong> 2.4M | <strong>Training Time:</strong> 48 hours on NVIDIA A100</p>
+                    <p><strong>Framework:</strong> TensorFlow 2.0 | <strong>Optimizer:</strong> Adam (lr=0.001)</p>
+                </div>
+            </div>
+
+            <!-- Educational Resources -->
+            <div class="educational-section">
+                <h2><i class="fas fa-graduation-cap"></i> Learning Resources</h2>
+                <div class="resources-grid">
+                    <div class="resource-card">
+                        <i class="fas fa-video"></i>
+                        <h3>Video Tutorials</h3>
+                        <p>Step-by-step guides for corn seed imaging and analysis</p>
+                        <a href="#">Watch Now →</a>
+                    </div>
+                    <div class="resource-card">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>Best Practices Guide</h3>
+                        <p>Optimize your seed photography for better results</p>
+                        <a href="#">Download PDF →</a>
+                    </div>
+                    <div class="resource-card">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <h3>Webinar Series</h3>
+                        <p>Live demonstrations and Q&A sessions</p>
+                        <a href="#">Register Now →</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/dataset.js"></script>
+</body>
+</html>

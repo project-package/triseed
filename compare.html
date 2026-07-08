@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Seeds - CornVision AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <span>CornVision AI</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+                <a href="analyze.html" class="nav-item"><i class="fas fa-camera"></i><span>Analyze Seed</span></a>
+                <a href="history.html" class="nav-item"><i class="fas fa-history"></i><span>History</span></a>
+                <a href="compare.html" class="nav-item active"><i class="fas fa-balance-scale"></i><span>Compare</span></a>
+                <a href="dataset.html" class="nav-item"><i class="fas fa-database"></i><span>Dataset</span></a>
+                <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="login.html" style="text-decoration: none;">
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Seed Comparison</h1>
+                    <p>Compare multiple seeds side-by-side</p>
+                </div>
+            </div>
+
+            <!-- Selection Area -->
+            <div class="comparison-selector">
+                <div class="seed-slots" id="seedSlots">
+                    <div class="slot" data-slot="0">
+                        <div class="slot-header">Seed 1</div>
+                        <div class="slot-content empty">
+                            <i class="fas fa-plus-circle"></i>
+                            <button class="select-from-history">From History</button>
+                            <button class="upload-new">Upload New</button>
+                        </div>
+                    </div>
+                    <div class="vs-divider">VS</div>
+                    <div class="slot" data-slot="1">
+                        <div class="slot-header">Seed 2</div>
+                        <div class="slot-content empty">
+                            <i class="fas fa-plus-circle"></i>
+                            <button class="select-from-history">From History</button>
+                            <button class="upload-new">Upload New</button>
+                        </div>
+                    </div>
+                    <div class="vs-divider">VS</div>
+                    <div class="slot" data-slot="2">
+                        <div class="slot-header">Seed 3</div>
+                        <div class="slot-content empty">
+                            <i class="fas fa-plus-circle"></i>
+                            <button class="select-from-history">From History</button>
+                            <button class="upload-new">Upload New</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Results -->
+            <div id="comparisonResults" class="comparison-results hidden">
+                <div class="results-header">
+                    <h2>Comparison Matrix</h2>
+                    <button id="exportComparisonBtn" class="btn-outline">
+                        <i class="fas fa-file-pdf"></i> Export as PDF
+                    </button>
+                </div>
+                
+                <div class="metrics-comparison">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th id="seed1Name">Seed 1</th>
+                                <th id="seed2Name">Seed 2</th>
+                                <th id="seed3Name">Seed 3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Variety</td><td id="var1">-</td><td id="var2">-</td><td id="var3">-</td></tr>
+                            <tr><td>Quality Grade</td><td id="qual1">-</td><td id="qual2">-</td><td id="qual3">-</td></tr>
+                            <tr><td>Performance Score</td><td id="perf1">-</td><td id="perf2">-</td><td id="perf3">-</td></tr>
+                            <tr><td>Confidence</td><td id="conf1">-</td><td id="conf2">-</td><td id="conf3">-</td></tr>
+                            <tr><td>Germination Potential</td><td id="germ1">-</td><td id="germ2">-</td><td id="germ3">-</td></tr>
+                            <tr><td>Market Value Index</td><td id="mvi1">-</td><td id="mvi2">-</td><td id="mvi3">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Comparison Chart -->
+                <div class="comparison-chart">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="recommendations" id="recommendations">
+                    <h3><i class="fas fa-lightbulb"></i> AI Recommendations</h3>
+                    <div id="recommendationsText"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/compare.js"></script>
+</body>
+</html>

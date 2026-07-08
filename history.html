@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - CornVision AI</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <span>CornVision AI</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+                <a href="analyze.html" class="nav-item"><i class="fas fa-camera"></i><span>Analyze Seed</span></a>
+                <a href="history.html" class="nav-item active"><i class="fas fa-history"></i><span>History</span></a>
+                <a href="compare.html" class="nav-item"><i class="fas fa-balance-scale"></i><span>Compare</span></a>
+                <a href="dataset.html" class="nav-item"><i class="fas fa-database"></i><span>Dataset</span></a>
+                <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Analysis History</h1>
+                    <p>View and manage all your corn seed analyses</p>
+                </div>
+                <div class="top-bar-actions">
+                    <button id="exportAllBtn" class="btn-outline">
+                        <i class="fas fa-download"></i> Export All
+                    </button>
+                    <button id="deleteAllBtn" class="btn-danger">
+                        <i class="fas fa-trash"></i> Clear All
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by variety, quality...">
+                </div>
+                <div class="filter-group">
+                    <select id="varietyFilter">
+                        <option value="">All Varieties</option>
+                        <option value="Waxy Corn">Waxy Corn</option>
+                        <option value="Sweet Corn">Sweet Corn</option>
+                        <option value="Hybrid Yellow">Hybrid Yellow</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="qualityFilter">
+                        <option value="">All Qualities</option>
+                        <option value="High Quality">High Quality</option>
+                        <option value="Moderate Quality">Moderate Quality</option>
+                        <option value="Low Quality">Low Quality</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <input type="date" id="dateFrom" placeholder="From">
+                    <input type="date" id="dateTo" placeholder="To">
+                </div>
+                <button id="applyFiltersBtn" class="btn-primary">Apply Filters</button>
+                <button id="clearFiltersBtn" class="btn-outline">Clear</button>
+            </div>
+
+            <!-- History Table -->
+            <div class="history-container">
+                <div class="history-stats">
+                    <span>Total: <strong id="totalCount">0</strong> analyses</span>
+                    <span>Showing: <strong id="showingCount">0</strong></span>
+                </div>
+                <div class="table-responsive">
+                    <table class="history-table" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>Date & Time</th>
+                                <th>Preview</th>
+                                <th>Variety</th>
+                                <th>Quality</th>
+                                <th>Performance</th>
+                                <th>Confidence</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="8" class="text-center">No analysis history found</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html>

@@ -141,7 +141,7 @@ function initUploadTab() {
 // Inside the runAnalysisBtn click handler, replace the resultsArea.innerHTML section
 // Look for this part and update it:
 
-setTimeout(() => {
+setTimeout(async () => {
     clearInterval(interval);
     const result = await CNNClassification(currentImagePreview);
 
@@ -184,6 +184,52 @@ const qualityCriteria = getQualityCriteria(
             <div class="result-item-full">
                 <div class="result-label">Quality Grade</div>
                 <div class="result-value-large quality-${qualityClass}">
+                <div class="feature-summary">
+
+    <h4>
+        Image Features
+    </h4>
+
+    <table class="feature-table">
+
+        <tr>
+            <td>Hue</td>
+            <td>${result.features.hue.toFixed(1)}</td>
+        </tr>
+
+        <tr>
+            <td>Saturation</td>
+            <td>${result.features.saturation.toFixed(1)}</td>
+        </tr>
+
+        <tr>
+            <td>Brightness</td>
+            <td>${result.features.brightness.toFixed(1)}</td>
+        </tr>
+
+        <tr>
+            <td>Yellow Ratio</td>
+            <td>${(result.features.yellowRatio*100).toFixed(1)}%</td>
+        </tr>
+
+        <tr>
+            <td>Texture</td>
+            <td>${result.features.texture.toFixed(1)}</td>
+        </tr>
+
+        <tr>
+            <td>Edge Density</td>
+            <td>${result.features.edgeDensity.toFixed(3)}</td>
+        </tr>
+
+        <tr>
+            <td>Uniformity</td>
+            <td>${result.features.uniformity.toFixed(1)}</td>
+        </tr>
+
+    </table>
+
+</div>
                     ${result.quality} ${result.confidence}%
                 </div>
             </div>
@@ -239,7 +285,7 @@ const qualityCriteria = getQualityCriteria(
         });
     }
     
-}, 2000);
+}, 2500);
         });
     }
 }
@@ -332,7 +378,7 @@ function initBatchTab() {
                 
                 // Simulate analysis
                 await new Promise(resolve => setTimeout(resolve, 800));
-                item.result = mockCNNClassification(item.preview);
+                item.result = await CNNClassification(item.preview);
                 updateBatchPreview();
             }
             

@@ -41,101 +41,428 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-// Replace the mockCNNClassification function with this updated version:
+/******************************************************************
+ * PART 1
+ * IMAGE PREPROCESSING & FEATURE EXTRACTION
+ ******************************************************************/
 
-function mockCNNClassification(imageDataURL) {
-    // Simulate AI processing with consistent results based on image data
-    let hash = 0;
-    if (imageDataURL) {
-        for (let i = 0; i < Math.min(imageDataURL.length, 1000); i++) {
-            hash = ((hash << 5) - hash) + imageDataURL.charCodeAt(i);
-            hash |= 0;
+function loadImage(dataURL){
+    return new Promise((resolve,reject)=>{
+
+        const img=new Image();
+
+        img.onload=()=>resolve(img);
+
+        img.onerror=reject;
+
+        img.src=dataURL;
+
+    });
+}
+
+
+
+function createCanvas(img){
+
+    const canvas=document.createElement("canvas");
+
+    const ctx=canvas.getContext("2d");
+
+    canvas.width=224;
+    canvas.height=224;
+
+    ctx.drawImage(img,0,0,224,224);
+
+    return {canvas,ctx};
+
+}
+
+
+
+/************************************************************
+ REMOVE WHITE BACKGROUND
+*************************************************************/
+
+function removeBackground(imageData){
+
+    const d=imageData.data;
+
+    for(let i=0;i<d.length;i+=4){
+
+        let r=d[i];
+        let g=d[i+1];
+        let b=d[i+2];
+
+        if(r>220 && g>220 && b>220){
+
+            d[i+3]=0;
+
         }
-    } else {
-        hash = Date.now();
+
     }
-    
-    // YOUR 3 SPECIFIC CORN VARIETIES ONLY
-    const varieties = ["Waxy Corn", "Sweet Corn", "Hybrid Yellow"];
-    const qualities = ["High Quality", "Moderate Quality", "Low Quality"];
-    
-    // More controlled distribution - can adjust weights if needed
-    // This ensures all 3 varieties appear naturally
-    const varietyIndex = Math.abs(hash % 3);  // Will always be 0, 1, or 2
-    const qualityIndex = Math.abs(Math.floor(hash / 7) % 3);
-    
-    // Calculate confidence based on hash consistency
-    const confidence = 75 + (Math.abs(hash % 20));
-    
-    // Performance score calculation based on variety and quality
-    let performanceScore = 0;
-    if (qualityIndex === 0) {
-        // High quality
-        if (varietyIndex === 0) performanceScore = 88 + (hash % 8);  // Waxy: 88-95
-        else if (varietyIndex === 1) performanceScore = 85 + (hash % 10); // Sweet: 85-94
-        else performanceScore = 82 + (hash % 12); // Hybrid Yellow: 82-93
-    } else if (qualityIndex === 1) {
-        // Moderate quality
-        if (varietyIndex === 0) performanceScore = 68 + (hash % 10);  // Waxy: 68-77
-        else if (varietyIndex === 1) performanceScore = 65 + (hash % 12); // Sweet: 65-76
-        else performanceScore = 62 + (hash % 14); // Hybrid Yellow: 62-75
-    } else {
-        // Low quality
-        if (varietyIndex === 0) performanceScore = 45 + (hash % 12);  // Waxy: 45-56
-        else if (varietyIndex === 1) performanceScore = 42 + (hash % 14); // Sweet: 42-55
-        else performanceScore = 40 + (hash % 15); // Hybrid Yellow: 40-54
+
+    return imageData;
+
+}
+
+
+
+/************************************************************
+ RGB FEATURES
+*************************************************************/
+
+function rgbFeatures(imageData){
+
+    const d=imageData.data;
+
+    let r=0;
+    let g=0;
+    let b=0;
+
+    let pixels=0;
+
+    for(let i=0;i<d.length;i+=4){
+
+        if(d[i+3]<20) continue;
+
+        r+=d[i];
+
+        g+=d[i+1];
+
+        b+=d[i+2];
+
+        pixels++;
+
     }
-    performanceScore = Math.min(98, Math.max(30, Math.round(performanceScore)));
-    
-    // Germination potential
-    const germinationPotential = Math.min(95, Math.max(40, performanceScore - 5 + (Math.abs(hash % 10))));
-    
-    // Market value index based on variety
-    let marketValueIndex = qualityIndex === 0 ? 90 : (qualityIndex === 1 ? 70 : 50);
-    if (varietyIndex === 0) marketValueIndex += 5;  // Waxy premium
-    if (varietyIndex === 1) marketValueIndex += 0;  // Sweet standard
-    
-    // Detailed traits for your 3 varieties
-    const traits = {
-        "Waxy Corn": "Chewy glutinous texture, high amylopectin starch. Excellent for Asian cuisine, industrial starch, and specialty food products. High market demand in premium segments.",
-        "Sweet Corn": "High sugar content, tender kernels, bright yellow color. Ideal for fresh consumption, canning, and frozen food industry. Superior eating quality.",
-        "Hybrid Yellow": "High-yielding hybrid variety with excellent kernel uniformity. Balanced starch content, disease resistant, suitable for both processing and animal feed."
+
+    return{
+
+        meanR:r/pixels,
+
+        meanG:g/pixels,
+
+        meanB:b/pixels,
+
+        pixels
+
     };
-    
-    // Visual characteristics for each variety
-    const visualTraits = {
-        "Waxy Corn": "Pearlescent white to pale yellow kernels, waxy appearance, uniform size",
-        "Sweet Corn": "Bright golden-yellow kernels, plump and juicy appearance, slight translucency",
-        "Hybrid Yellow": "Deep yellow to orange kernels, uniform shape, robust texture"
+
+}
+
+
+
+/************************************************************
+ HSV CONVERSION
+*************************************************************/
+
+function rgbToHSV(r,g,b){
+
+    r/=255;
+    g/=255;
+    b/=255;
+
+    let max=Math.max(r,g,b);
+
+    let min=Math.min(r,g,b);
+
+    let h,s,v=max;
+
+    let d=max-min;
+
+    s=max===0?0:d/max;
+
+    if(max===min){
+
+        h=0;
+
+    }else{
+
+        switch(max){
+
+            case r:
+
+                h=(g-b)/d+(g<b?6:0);
+
+                break;
+
+            case g:
+
+                h=(b-r)/d+2;
+
+                break;
+
+            case b:
+
+                h=(r-g)/d+4;
+
+                break;
+
+        }
+
+        h/=6;
+
+    }
+
+    return{
+
+        h:h*360,
+
+        s:s*100,
+
+        v:v*100
+
     };
-    
-    // Disease detection (mock)
-    const diseases = ["None detected", "Minor surface blemishes", "Potential fungal spots", "Insect damage visible"];
-    const diseaseIndex = Math.abs(Math.floor(hash / 13) % 4);
-    
-    // Quality description based on grade
-    const qualityDescriptions = {
-        "High Quality": "Superior seed with excellent characteristics. Optimal size, color, and texture. No defects visible.",
-        "Moderate Quality": "Good quality seed with minor imperfections. Suitable for most applications.",
-        "Low Quality": "Significant defects present. Limited applications. Consider for processing only."
+
+}
+
+
+
+/************************************************************
+ HSV FEATURES
+*************************************************************/
+
+function hsvFeatures(imageData){
+
+    const d=imageData.data;
+
+    let H=0;
+
+    let S=0;
+
+    let V=0;
+
+    let pixels=0;
+
+    for(let i=0;i<d.length;i+=4){
+
+        if(d[i+3]<20) continue;
+
+        const hsv=rgbToHSV(d[i],d[i+1],d[i+2]);
+
+        H+=hsv.h;
+
+        S+=hsv.s;
+
+        V+=hsv.v;
+
+        pixels++;
+
+    }
+
+    return{
+
+        hue:H/pixels,
+
+        saturation:S/pixels,
+
+        brightness:V/pixels
+
     };
-    
-    return {
-        variety: varieties[varietyIndex],
-        quality: qualities[qualityIndex],
-        qualityDescription: qualityDescriptions[qualities[qualityIndex]],
-        confidence: Math.round(confidence),
-        performanceScore: performanceScore,
-        germinationPotential: Math.round(germinationPotential),
-        marketValueIndex: marketValueIndex,
-        traits: traits[varieties[varietyIndex]],
-        visualTraits: visualTraits[varieties[varietyIndex]],
-        diseaseDetection: diseases[diseaseIndex],
-        varietyIndex: varietyIndex,
-        qualityIndex: qualityIndex,
-        timestamp: Date.now(),
-        date: new Date().toLocaleString()
+
+}
+
+
+
+/************************************************************
+ YELLOW PIXEL RATIO
+*************************************************************/
+
+function yellowRatio(imageData){
+
+    const d=imageData.data;
+
+    let yellow=0;
+
+    let total=0;
+
+    for(let i=0;i<d.length;i+=4){
+
+        if(d[i+3]<20) continue;
+
+        total++;
+
+        let r=d[i];
+
+        let g=d[i+1];
+
+        let b=d[i+2];
+
+        if(r>150 && g>120 && b<150){
+
+            yellow++;
+
+        }
+
+    }
+
+    return yellow/total;
+
+}
+
+
+
+/************************************************************
+ TEXTURE VARIANCE
+*************************************************************/
+
+function textureVariance(imageData){
+
+    const d=imageData.data;
+
+    let values=[];
+
+    for(let i=0;i<d.length;i+=4){
+
+        if(d[i+3]<20) continue;
+
+        values.push(
+
+            (d[i]+d[i+1]+d[i+2])/3
+
+        );
+
+    }
+
+    let mean=
+
+        values.reduce((a,b)=>a+b,0)/values.length;
+
+    let variance=0;
+
+    for(let v of values){
+
+        variance+=(v-mean)*(v-mean);
+
+    }
+
+    variance/=values.length;
+
+    return variance;
+
+}
+
+
+
+/************************************************************
+ EDGE DENSITY
+*************************************************************/
+
+function edgeDensity(imageData){
+
+    const d=imageData.data;
+
+    const w=imageData.width;
+
+    const h=imageData.height;
+
+    let edges=0;
+
+    for(let y=1;y<h-1;y++){
+
+        for(let x=1;x<w-1;x++){
+
+            const i=(y*w+x)*4;
+
+            const left=((y*w+x-1)*4);
+
+            const right=((y*w+x+1)*4);
+
+            const up=(((y-1)*w+x)*4);
+
+            const down=(((y+1)*w+x)*4);
+
+            const gx=Math.abs(d[left]-d[right]);
+
+            const gy=Math.abs(d[up]-d[down]);
+
+            if(gx+gy>60){
+
+                edges++;
+
+            }
+
+        }
+
+    }
+
+    return edges/(w*h);
+
+}
+
+
+
+/************************************************************
+ UNIFORMITY SCORE
+*************************************************************/
+
+function uniformity(imageData){
+
+    const d=imageData.data;
+
+    let values=[];
+
+    for(let i=0;i<d.length;i+=4){
+
+        if(d[i+3]<20) continue;
+
+        values.push(d[i]);
+
+    }
+
+    let mean=
+
+        values.reduce((a,b)=>a+b,0)/values.length;
+
+    let diff=0;
+
+    for(let v of values){
+
+        diff+=Math.abs(v-mean);
+
+    }
+
+    return 100-(diff/values.length);
+
+}
+
+
+
+/************************************************************
+ MAIN FEATURE EXTRACTOR
+*************************************************************/
+
+async function extractImageFeatures(imageDataURL){
+
+    const img=await loadImage(imageDataURL);
+
+    const {ctx}=createCanvas(img);
+
+    let imageData=ctx.getImageData(0,0,224,224);
+
+    imageData=removeBackground(imageData);
+
+    ctx.putImageData(imageData,0,0);
+
+    const rgb=rgbFeatures(imageData);
+
+    const hsv=hsvFeatures(imageData);
+
+    return{
+
+        ...rgb,
+
+        ...hsv,
+
+        yellowRatio:yellowRatio(imageData),
+
+        texture:textureVariance(imageData),
+
+        edgeDensity:edgeDensity(imageData),
+
+        uniformity:uniformity(imageData)
+
     };
+
 }
 
 // Quality criteria descriptions based on visual features

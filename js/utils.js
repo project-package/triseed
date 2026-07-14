@@ -465,6 +465,309 @@ async function extractImageFeatures(imageDataURL){
 
 }
 
+/******************************************************************
+ * PART 2
+ * RULE-BASED CLASSIFICATION ENGINE
+ ******************************************************************/
+
+const CORN_REFERENCE = {
+
+    "Waxy Corn": {
+        hue: 50,
+        saturation: 30,
+        brightness: 78,
+        yellowRatio: 0.30,
+        texture: 180,
+        edgeDensity: 0.06,
+        uniformity: 90
+    },
+
+    "Sweet Corn": {
+        hue: 55,
+        saturation: 65,
+        brightness: 88,
+        yellowRatio: 0.70,
+        texture: 140,
+        edgeDensity: 0.05,
+        uniformity: 94
+    },
+
+    "Hybrid Yellow": {
+        hue: 45,
+        saturation: 82,
+        brightness: 72,
+        yellowRatio: 0.90,
+        texture: 230,
+        edgeDensity: 0.08,
+        uniformity: 92
+    }
+
+};
+
+
+
+/****************************************************
+ NORMALIZED DIFFERENCE
+****************************************************/
+
+function featureDifference(value,target,range){
+
+    return Math.abs(value-target)/range;
+
+}
+
+
+
+/****************************************************
+ DISTANCE TO EACH VARIETY
+****************************************************/
+
+function calculateSimilarity(features,reference){
+
+    let score=0;
+
+    score+=featureDifference(features.hue,reference.hue,180);
+
+    score+=featureDifference(features.saturation,reference.saturation,100);
+
+    score+=featureDifference(features.brightness,reference.brightness,100);
+
+    score+=featureDifference(features.yellowRatio,reference.yellowRatio,1);
+
+    score+=featureDifference(features.texture,reference.texture,300);
+
+    score+=featureDifference(features.edgeDensity,reference.edgeDensity,0.2);
+
+    score+=featureDifference(features.uniformity,reference.uniformity,100);
+
+    return score;
+
+}
+
+
+
+/****************************************************
+ CLASSIFY VARIETY
+****************************************************/
+
+function classifyVariety(features){
+
+    let bestVariety=null;
+
+    let smallestDistance=999;
+
+    for(const variety in CORN_REFERENCE){
+
+        const distance=
+
+            calculateSimilarity(
+
+                features,
+
+                CORN_REFERENCE[variety]
+
+            );
+
+        if(distance<smallestDistance){
+
+            smallestDistance=distance;
+
+            bestVariety=variety;
+
+        }
+
+    }
+
+    let confidence=
+
+        Math.max(
+
+            60,
+
+            Math.min(
+
+                99,
+
+                Math.round(
+
+                    100-(smallestDistance*25)
+
+                )
+
+            )
+
+        );
+
+    return{
+
+        variety:bestVariety,
+
+        confidence,
+
+        distance:smallestDistance
+
+    };
+
+}
+
+
+
+/****************************************************
+ QUALITY GRADING
+****************************************************/
+
+function classifyQuality(features){
+
+    let score=0;
+
+
+
+    if(features.uniformity>92) score+=25;
+    else if(features.uniformity>85) score+=18;
+    else score+=8;
+
+
+
+    if(features.texture<170) score+=20;
+    else if(features.texture<220) score+=14;
+    else score+=8;
+
+
+
+    if(features.edgeDensity<0.06) score+=20;
+    else if(features.edgeDensity<0.08) score+=14;
+    else score+=8;
+
+
+
+    if(features.brightness>80) score+=15;
+    else if(features.brightness>70) score+=10;
+    else score+=6;
+
+
+
+    if(features.yellowRatio>0.60) score+=20;
+    else if(features.yellowRatio>0.40) score+=15;
+    else score+=10;
+
+
+
+    let quality;
+
+    if(score>=85){
+
+        quality="High Quality";
+
+    }else if(score>=65){
+
+        quality="Moderate Quality";
+
+    }else{
+
+        quality="Low Quality";
+
+    }
+
+
+
+    return{
+
+        quality,
+
+        score
+
+    };
+
+}
+
+
+
+/****************************************************
+ VARIETY DESCRIPTIONS
+****************************************************/
+
+const varietyTraits={
+
+    "Waxy Corn":
+        "Glutinous kernels with high amylopectin starch. Usually pale yellow to creamy white and slightly opaque.",
+
+    "Sweet Corn":
+        "High sugar content with bright yellow kernels and smooth glossy appearance.",
+
+    "Hybrid Yellow":
+        "Deep yellow hybrid kernels with excellent uniformity and robust structure."
+
+};
+
+
+
+const visualTraits={
+
+    "Waxy Corn":
+        "Pale yellow, waxy appearance, low saturation.",
+
+    "Sweet Corn":
+        "Bright yellow, smooth glossy surface.",
+
+    "Hybrid Yellow":
+        "Deep yellow to orange kernels with dense texture."
+
+};
+
+
+
+/****************************************************
+ MAIN CLASSIFIER
+****************************************************/
+
+async function CNNClassification(imageDataURL){
+
+    const features=
+
+        await extractImageFeatures(imageDataURL);
+
+    const variety=
+
+        classifyVariety(features);
+
+    const quality=
+
+        classifyQuality(features);
+
+    return{
+
+        variety:variety.variety,
+
+        confidence:variety.confidence,
+
+        quality:quality.quality,
+
+        performanceScore:quality.score,
+
+        germinationPotential:
+
+            Math.min(95,quality.score+5),
+
+        marketValueIndex:
+
+            Math.min(100,quality.score+8),
+
+        traits:
+
+            varietyTraits[variety.variety],
+
+        visualTraits:
+
+            visualTraits[variety.variety],
+
+        diseaseDetection:"None detected",
+
+        features
+
+    };
+
+}
+
 // Quality criteria descriptions based on visual features
 function getQualityCriteria(quality, variety) {
     const criteria = {

@@ -143,7 +143,13 @@ function initUploadTab() {
 
 setTimeout(() => {
     clearInterval(interval);
-    const result = mockCNNClassification(currentImagePreview);
+    const result = await CNNClassification(currentImagePreview);
+
+// Get quality criteria
+const qualityCriteria = getQualityCriteria(
+    result.quality,
+    result.variety
+);
     
     // Get quality criteria
     const qualityCriteria = getQualityCriteria(result.quality, result.variety);

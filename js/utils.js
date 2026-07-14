@@ -572,7 +572,7 @@ return{
 const CORN_REFERENCE = {
 
 "Waxy Corn": {
-    hue: 100,
+    hue: 70,
     saturation: 18,
     brightness: 62,
     whiteRatio: 0.75,

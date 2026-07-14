@@ -299,6 +299,40 @@ function yellowRatio(imageData){
 
 }
 
+function whiteRatio(imageData){
+
+    const d = imageData.data;
+
+    let white = 0;
+    let total = 0;
+
+    for(let i=0;i<d.length;i+=4){
+
+        if(d[i+3] < 20) continue;
+
+        total++;
+
+        const r = d[i];
+        const g = d[i+1];
+        const b = d[i+2];
+
+        // White / Cream
+        if(
+            r > 180 &&
+            g > 180 &&
+            b > 150 &&
+            Math.abs(r-g) < 25 &&
+            Math.abs(g-b) < 35
+        ){
+            white++;
+        }
+
+    }
+
+    return white / total;
+
+}
+
 function orangeRatio(imageData){
 
     const d = imageData.data;
@@ -512,6 +546,8 @@ return{
 
     ...hsv,
 
+    whiteRatio: whiteRatio(imageData),
+
     yellowRatio: yellowRatio(imageData),
 
     orangeRatio: orangeRatio(imageData),
@@ -535,15 +571,29 @@ return{
 
 const CORN_REFERENCE = {
 
-    "Waxy Corn": {
-        hue: 50,
-        saturation: 30,
-        brightness: 78,
-        yellowRatio: 0.30,
-        texture: 180,
-        edgeDensity: 0.06,
-        uniformity: 90
-    },
+"Waxy Corn":{
+
+    hue:55,
+
+    saturation:20,
+
+    brightness:92,
+
+    whiteRatio:0.75,
+
+    yellowRatio:0.10,
+
+    orangeRatio:0.02,
+
+    redDominance:0.01,
+
+    texture:170,
+
+    edgeDensity:0.05,
+
+    uniformity:95
+
+},
 
 "Sweet Corn":{
 
@@ -625,6 +675,8 @@ function calculateSimilarity(features,reference){
 
     score += featureDifference(features.orangeRatio, reference.orangeRatio,1);
 
+    score += featureDifference(features.whiteRatio,reference.whiteRatio,1);
+
     return score;
 
 }
@@ -647,6 +699,14 @@ let distance = calculateSimilarity(
     features,
     CORN_REFERENCE[variety]
 );
+
+if(
+    variety === "Waxy Corn" &&
+    features.whiteRatio > 0.60 &&
+    features.saturation < 35
+){
+    distance *= 0.60;
+}
 
         // Give Hybrid Yellow an advantage when orange/red is dominant
 if (

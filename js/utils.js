@@ -571,70 +571,45 @@ return{
 
 const CORN_REFERENCE = {
 
-"Waxy Corn":{
-
-    hue:55,
-
-    saturation:20,
-
-    brightness:92,
-
-    whiteRatio:0.75,
-
-    yellowRatio:0.10,
-
-    orangeRatio:0.02,
-
-    redDominance:0.01,
-
-    texture:170,
-
-    edgeDensity:0.05,
-
-    uniformity:95
-
+"Waxy Corn": {
+    hue: 100,
+    saturation: 18,
+    brightness: 62,
+    whiteRatio: 0.75,
+    yellowRatio: 0.05,
+    orangeRatio: 0.00,
+    redDominance: 0.00,
+    texture: 170,
+    edgeDensity: 0.05,
+    uniformity: 95
 },
 
-"Sweet Corn":{
-
-    hue:58,
-
-    saturation:55,
-
-    brightness:90,
-
-    yellowRatio:0.80,
-
-    orangeRatio:0.05,
-
-    texture:140,
-
-    edgeDensity:0.05,
-
-    uniformity:94
-
+"Sweet Corn": {
+    hue: 52,
+    saturation: 73,
+    brightness: 79,
+    whiteRatio: 0.08,
+    yellowRatio: 0.80,
+    orangeRatio: 0.08,
+    redDominance: 0.05,
+    texture: 145,
+    edgeDensity: 0.05,
+    uniformity: 94
 },
 
-"Hybrid Yellow":{
-
-    hue:38,
-
-    saturation:88,
-
-    brightness:74,
-
-    yellowRatio:0.65,
-
-    orangeRatio:0.45,
-
-    texture:220,
-
-    edgeDensity:0.08,
-
-    uniformity:91
-
-},
-
+"Hybrid Yellow": {
+    hue: 36,
+    saturation: 64,
+    brightness: 85,
+    whiteRatio: 0.02,
+    yellowRatio: 0.55,
+    orangeRatio: 0.35,
+    redDominance: 0.25,
+    texture: 220,
+    edgeDensity: 0.08,
+    uniformity: 91
+}
+    
 };
 
 
@@ -700,40 +675,40 @@ let distance = calculateSimilarity(
     CORN_REFERENCE[variety]
 );
 
-if(
-    variety === "Waxy Corn" &&
-    features.whiteRatio > 0.60 &&
-    features.saturation < 35
-){
-    distance *= 0.60;
+// Detect Waxy Corn first
+if (
+    features.saturation < 30 &&
+    features.whiteRatio > 0.45
+) {
+    return {
+        variety: "Waxy Corn",
+        confidence: 96,
+        distance: 0
+    };
 }
 
-        // Give Hybrid Yellow an advantage when orange/red is dominant
+// Hybrid Yellow
 if (
-    variety === "Hybrid Yellow" &&
-    features.orangeRatio > 0.30 &&
-    features.redDominance > 0.20
+    features.hue < 45 &&
+    features.orangeRatio > 0.25
 ) {
-    distance *= 0.80;   // Reduce distance by 20%
+    return {
+        variety: "Hybrid Yellow",
+        confidence: 94,
+        distance: 0
+    };
 }
 
-// Give Sweet Corn an advantage when bright light-yellow
+// Sweet Corn
 if (
-    variety === "Sweet Corn" &&
-    features.yellowRatio > 0.70 &&
-    features.brightness > 85 &&
-    features.orangeRatio < 0.15
+    features.hue >= 45 &&
+    features.yellowRatio > 0.60
 ) {
-    distance *= 0.80;
-}
-
-// Give Waxy Corn an advantage when pale with low saturation
-if (
-    variety === "Waxy Corn" &&
-    features.saturation < 40 &&
-    features.yellowRatio < 0.40
-) {
-    distance *= 0.80;
+    return {
+        variety: "Sweet Corn",
+        confidence: 94,
+        distance: 0
+    };
 }
 
         if(distance<smallestDistance){

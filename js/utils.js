@@ -299,7 +299,66 @@ function yellowRatio(imageData){
 
 }
 
+function orangeRatio(imageData){
 
+    const d = imageData.data;
+
+    let orange = 0;
+    let total = 0;
+
+    for(let i = 0; i < d.length; i += 4){
+
+        if(d[i+3] < 20) continue;
+
+        total++;
+
+        const r = d[i];
+        const g = d[i+1];
+        const b = d[i+2];
+
+        // Orange / Dark Yellow
+        if(
+            r > 170 &&
+            g > 80 &&
+            g < 180 &&
+            b < 100 &&
+            r > g + 20
+        ){
+            orange++;
+        }
+
+    }
+
+    return orange / total;
+
+}
+
+function redDominance(imageData){
+
+    const d = imageData.data;
+
+    let total = 0;
+
+    let red = 0;
+
+    for(let i=0;i<d.length;i+=4){
+
+        if(d[i+3] < 20) continue;
+
+        total++;
+
+        if(
+            d[i] > d[i+1] + 20 &&
+            d[i] > d[i+2] + 30
+        ){
+            red++;
+        }
+
+    }
+
+    return red / total;
+
+}
 
 /************************************************************
  TEXTURE VARIANCE
@@ -447,21 +506,25 @@ async function extractImageFeatures(imageDataURL){
 
     const hsv=hsvFeatures(imageData);
 
-    return{
+return{
 
-        ...rgb,
+    ...rgb,
 
-        ...hsv,
+    ...hsv,
 
-        yellowRatio:yellowRatio(imageData),
+    yellowRatio: yellowRatio(imageData),
 
-        texture:textureVariance(imageData),
+    orangeRatio: orangeRatio(imageData),
 
-        edgeDensity:edgeDensity(imageData),
+    redDominance: redDominance(imageData),
 
-        uniformity:uniformity(imageData)
+    texture: textureVariance(imageData),
 
-    };
+    edgeDensity: edgeDensity(imageData),
+
+    uniformity: uniformity(imageData)
+
+};
 
 }
 
@@ -482,25 +545,45 @@ const CORN_REFERENCE = {
         uniformity: 90
     },
 
-    "Sweet Corn": {
-        hue: 55,
-        saturation: 65,
-        brightness: 88,
-        yellowRatio: 0.70,
-        texture: 140,
-        edgeDensity: 0.05,
-        uniformity: 94
-    },
+"Sweet Corn":{
 
-    "Hybrid Yellow": {
-        hue: 45,
-        saturation: 82,
-        brightness: 72,
-        yellowRatio: 0.90,
-        texture: 230,
-        edgeDensity: 0.08,
-        uniformity: 92
-    }
+    hue:58,
+
+    saturation:55,
+
+    brightness:90,
+
+    yellowRatio:0.80,
+
+    orangeRatio:0.05,
+
+    texture:140,
+
+    edgeDensity:0.05,
+
+    uniformity:94
+
+},
+
+"Hybrid Yellow":{
+
+    hue:38,
+
+    saturation:88,
+
+    brightness:74,
+
+    yellowRatio:0.65,
+
+    orangeRatio:0.45,
+
+    texture:220,
+
+    edgeDensity:0.08,
+
+    uniformity:91
+
+},
 
 };
 
@@ -540,6 +623,8 @@ function calculateSimilarity(features,reference){
 
     score+=featureDifference(features.uniformity,reference.uniformity,100);
 
+    score += featureDifference(features.orangeRatio, reference.orangeRatio,1);
+
     return score;
 
 }
@@ -567,6 +652,34 @@ function classifyVariety(features){
                 CORN_REFERENCE[variety]
 
             );
+
+        // Give Hybrid Yellow an advantage when orange/red is dominant
+if (
+    variety === "Hybrid Yellow" &&
+    features.orangeRatio > 0.30 &&
+    features.redDominance > 0.20
+) {
+    distance *= 0.80;   // Reduce distance by 20%
+}
+
+// Give Sweet Corn an advantage when bright light-yellow
+if (
+    variety === "Sweet Corn" &&
+    features.yellowRatio > 0.70 &&
+    features.brightness > 85 &&
+    features.orangeRatio < 0.15
+) {
+    distance *= 0.80;
+}
+
+// Give Waxy Corn an advantage when pale with low saturation
+if (
+    variety === "Waxy Corn" &&
+    features.saturation < 40 &&
+    features.yellowRatio < 0.40
+) {
+    distance *= 0.80;
+}
 
         if(distance<smallestDistance){
 

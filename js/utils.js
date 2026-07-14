@@ -643,15 +643,10 @@ function classifyVariety(features){
 
     for(const variety in CORN_REFERENCE){
 
-        const distance=
-
-            calculateSimilarity(
-
-                features,
-
-                CORN_REFERENCE[variety]
-
-            );
+let distance = calculateSimilarity(
+    features,
+    CORN_REFERENCE[variety]
+);
 
         // Give Hybrid Yellow an advantage when orange/red is dominant
 if (

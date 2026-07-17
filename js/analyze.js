@@ -214,10 +214,7 @@ setTimeout(async () => {
                     <strong>👁️ Visual Indicators Observed:</strong>
                     <pre>${qualityCriteria.visual}</pre>
                 </div>
-                <div class="criteria-section">
-                    <strong>📏 Quality Standards Met:</strong>
-                    <pre>${qualityCriteria.standards}</pre>
-                </div>
+
                 <div class="why-explanation">
                     <strong><i class="fas fa-question-circle"></i> Why ${result.quality}?:</strong><br>
                     ${qualityCriteria.why}

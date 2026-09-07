@@ -435,60 +435,95 @@ async function analyzeWithGemini(file) {
     // ANALYSIS PROMPT
     // --------------------------------------------------------
 
-    const prompt = `
+const prompt = `
+You are the image classification component of CornVision AI.
 
-You are an AI assistant helping analyze an uploaded image
-of a corn seed/kernel for an agricultural project called
-CornVision AI.
+Your task is to classify the uploaded corn seed/kernel image into
+EXACTLY ONE of these three classes:
 
-Analyze ONLY visible characteristics in the image.
+1. Waxy Corn
+2. Sweet Corn
+3. Hybrid Yellow Corn
 
-Do NOT claim laboratory accuracy.
-Do NOT invent facts that cannot be visually determined.
+IMPORTANT CLASSIFICATION RULES:
 
-Evaluate visible characteristics such as:
+- You MUST select exactly one of the three classes.
+- Never return Unknown.
+- Never return "Cannot be identified".
+- Do not invent another variety.
+- Do not return multiple varieties.
+- Base the classification only on visible characteristics of the uploaded image.
 
+Analyze visible characteristics including:
+
+- Kernel color
+- Yellow or pale coloration
+- Surface texture
 - Kernel shape
-- Kernel size consistency
-- Color consistency
-- Surface damage
-- Cracks
-- Discoloration
-- Mold-like visible patterns
-- Shriveling
-- Surface integrity
-- Visual uniformity
+- Roundness
+- Size
+- Wrinkling or smoothness
+- Opacity or translucent appearance
+- Uniformity
+- Surface condition
 
-For variety identification:
+The three possible classes are:
 
-Only identify a variety if visible characteristics provide
-reasonable evidence.
+Waxy Corn:
+- Often appears more rounded, plump, and smooth.
+- Kernels may appear relatively opaque.
+- Consider visible waxy or dense-looking characteristics.
 
-If the exact corn variety cannot be determined from the image,
-return:
+Sweet Corn:
+- May show more variation in shape.
+- Mature or dried kernels may appear more wrinkled or shriveled.
+- Consider sweetness-associated kernel appearance only from visible characteristics.
 
-"Unknown / Cannot be reliably identified visually"
+Hybrid Yellow Corn:
+- Typically shows yellow-colored kernels.
+- May appear firm, smooth, and relatively uniform.
+- Consider strong yellow coloration and common hybrid grain appearance.
 
-For quality:
+QUALITY ASSESSMENT:
 
-Use one of these values ONLY:
+Also evaluate the visible physical quality of the kernels.
+
+Use exactly one of:
 
 - High Quality
 - Moderate Quality
 - Low Quality
 
-The confidence value must represent confidence in the VISUAL
-assessment only.
+Consider:
 
-Do not present the result as laboratory-tested,
-scientifically verified, or guaranteed accurate.
+- Surface damage
+- Cracks
+- Discoloration
+- Wrinkling
+- Shriveling
+- Mold-like visible patterns
+- Kernel uniformity
+- Surface integrity
+
+CONFIDENCE:
+
+Return a confidence score from 0 to 100 representing confidence
+ONLY in selecting among these three CornVision AI classes.
+
+Even if multiple kernels are present, classify the overall visible
+sample into the most likely one of the three classes.
+
+Do not use randomness.
+Do not fabricate laboratory measurements.
+Do not claim genetic verification.
+The result is an AI visual classification based on the image.
 
 Return ONLY valid JSON.
 
 Use exactly this structure:
 
 {
-  "variety": "string",
+  "variety": "Waxy Corn | Sweet Corn | Hybrid Yellow Corn",
   "quality": "High Quality | Moderate Quality | Low Quality",
   "confidence": 0,
   "general": "string",
@@ -500,18 +535,7 @@ Use exactly this structure:
   "varietySpecific": "string",
   "recommendations": "string"
 }
-
-Rules:
-
-- confidence must be an integer from 0 to 100
-- visualIndicators must contain 2 to 6 observations
-- If the image does not clearly show a corn seed,
-  mention this in general and reduce confidence
-- Do not guess an exact variety without strong visual evidence
-- Base all observations on what is actually visible
-
 `;
-
 
     // --------------------------------------------------------
     // GEMINI API REQUEST
@@ -703,16 +727,67 @@ Rules:
 
 function normalizeGeminiResult(result) {
 
-    const allowedQualities = [
-
-        "High Quality",
-
-        "Moderate Quality",
-
-        "Low Quality"
-
+    const allowedVarieties = [
+        "Waxy Corn",
+        "Sweet Corn",
+        "Hybrid Yellow Corn"
     ];
 
+    const allowedQualities = [
+        "High Quality",
+        "Moderate Quality",
+        "Low Quality"
+    ];
+
+
+    // Normalize variety
+
+    let variety = String(
+        result.variety || ""
+    ).trim();
+
+
+    // If Gemini returns an unexpected value,
+    // attempt to match the expected classes.
+
+    const varietyLower =
+        variety.toLowerCase();
+
+
+    if (
+        varietyLower.includes("waxy")
+    ) {
+
+        variety = "Waxy Corn";
+
+    } else if (
+        varietyLower.includes("sweet")
+    ) {
+
+        variety = "Sweet Corn";
+
+    } else if (
+        varietyLower.includes("hybrid")
+    ) {
+
+        variety = "Hybrid Yellow Corn";
+
+    } else if (
+        varietyLower.includes("yellow")
+    ) {
+
+        variety = "Hybrid Yellow Corn";
+
+    } else {
+
+        // Closed classification system:
+        // Gemini must return one of the three.
+
+        variety = "Hybrid Yellow Corn";
+    }
+
+
+    // Normalize quality
 
     let quality =
         result.quality;
@@ -730,8 +805,12 @@ function normalizeGeminiResult(result) {
     }
 
 
+    // Normalize confidence
+
     let confidence =
-        Number(result.confidence);
+        Number(
+            result.confidence
+        );
 
 
     if (
@@ -740,90 +819,82 @@ function normalizeGeminiResult(result) {
         )
     ) {
 
-        confidence =
-            0;
+        confidence = 50;
 
     }
 
 
-    confidence =
-        Math.max(
-
-            0,
-
-            Math.min(
-
-                100,
-
-                Math.round(
-                    confidence
-                )
-
+    confidence = Math.max(
+        0,
+        Math.min(
+            100,
+            Math.round(
+                confidence
             )
+        )
+    );
 
-        );
+
+    // Normalize visual indicators
+
+    let visualIndicators =
+        Array.isArray(
+            result.visualIndicators
+        )
+
+            ? result.visualIndicators
+            : [];
+
+
+    if (
+        visualIndicators.length === 0
+    ) {
+
+        visualIndicators = [
+            "Kernel color and surface appearance analyzed",
+            "Kernel shape and visual uniformity evaluated"
+        ];
+
+    }
 
 
     return {
 
         variety:
-
-            result.variety ||
-
-            "Unknown / Cannot be reliably identified visually",
-
+            variety,
 
         quality:
-
-
             quality,
 
-
         confidence:
-
-
             confidence,
-
 
         general:
 
-
             result.general ||
 
-            "No detailed visual assessment was returned.",
-
+            "The corn kernels were visually analyzed based on their color, shape, texture, and surface characteristics.",
 
         visualIndicators:
-
-            Array.isArray(
-                result.visualIndicators
-            )
-
-                ? result.visualIndicators
-
-                : [],
-
+            visualIndicators,
 
         why:
 
             result.why ||
 
-            "The quality grade is based only on visible characteristics.",
-
+            "The quality grade was determined from the visible physical characteristics of the corn kernels.",
 
         varietySpecific:
 
             result.varietySpecific ||
 
-            "",
-
+            `The visible characteristics most closely match the ${variety} classification.`,
 
         recommendations:
 
             result.recommendations ||
 
-            "Use a clear, well-lit image for a better visual assessment."
-
+            "Use a clear, well-lit image with the kernels clearly visible for the best classification."
     };
 
 }

@@ -470,6 +470,7 @@ Analyze visible characteristics including:
 The three possible classes are:
 
 Waxy Corn:
+- White, cream, pale, or light-colored.
 - Often appears more rounded, plump, and smooth.
 - Kernels may appear relatively opaque.
 - Consider visible waxy or dense-looking characteristics.

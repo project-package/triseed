@@ -542,81 +542,36 @@ Use exactly this structure:
     // GEMINI API REQUEST
     // --------------------------------------------------------
 
-    const endpoint =
+const endpoint =
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
 
-        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-
-
-    const response = await fetch(
-
-        endpoint,
-
-        {
-
-            method: "POST",
-
-            headers: {
-
-                "Content-Type":
-                    "application/json",
-
-                "x-goog-api-key":
-                    GEMINI_API_KEY
-
-            },
-
-
-            body:
-
-                JSON.stringify({
-
-                    contents: [
-
-                        {
-
-                            role: "user",
-
-                            parts: [
-
-                                {
-
-                                    text:
-                                        prompt
-
-                                },
-
-                                {
-
-                                    inlineData: {
-
-                                        mimeType:
-                                            file.type,
-
-                                        data:
-                                            base64Data
-
-                                    }
-
-                                }
-
-                            ]
-
+const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        contents: [
+            {
+                role: "user",
+                parts: [
+                    {
+                        text: prompt
+                    },
+                    {
+                        inlineData: {
+                            mimeType: file.type,
+                            data: base64Data
                         }
-
-                    ],
-
-
-                    generationConfig: {
-
-                        temperature:
-                            0.2,
-
-                        responseMimeType:
-                            "application/json"
-
                     }
-
-                })
+                ]
+            }
+        ],
+        generationConfig: {
+            temperature: 0.2,
+            responseMimeType: "application/json"
+        }
+    })
 
         }
 

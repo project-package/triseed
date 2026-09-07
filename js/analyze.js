@@ -6,7 +6,7 @@
 // IMPORTANT:
 // For testing only, paste your Gemini API key below.
 // Do NOT expose this key in a public production website.
-const GEMINI_API_KEY = "PASTE_YOUR_GEMINI_API_KEY_HERE";
+const GEMINI_API_KEY = "AQ.Ab8RN6JHAYPmtx4EztEIF9PD3sKkl_o75spvevwWHdVvol6r4w";
 
 // You can change this model if needed.
 const GEMINI_MODEL = "gemini-3.7-flash";

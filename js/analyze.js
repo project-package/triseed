@@ -9,7 +9,7 @@
 const GEMINI_API_KEY = "AQ.AQ.Ab8RN6I1QweLevrfkxbHaxaz3Map6yH4o2LjqUIx9viQRUSByQ";
 
 // You can change this model if needed.
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.5-flash";
 
 // $apiKey = 'AQ.Ab8RN6LkkqQGaVk0bh5gzJWmtC9i0C3sDGDJKQfVOHcdv-WntQ';
 // $endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
